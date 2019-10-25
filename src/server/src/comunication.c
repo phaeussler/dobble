@@ -142,7 +142,8 @@ int add_words(uint16_t* card, unsigned char* payload, int* size, char** words, i
         // payload[curr] = mySize;
         memcpy(&payload[curr], &mySize, 1);
         for(int j = 0; j < mySize; j++){
-            payload[curr + j + 1] = word[j];
+            // payload[curr + j + 1] = word[j];
+            memcpy(&payload[curr + j + 1], &word[j], 1);
         }
         // payload[curr + mySize + 1] = pos;
         memcpy(&payload[curr + mySize + 1], &pos, 1);
@@ -153,7 +154,7 @@ int add_words(uint16_t* card, unsigned char* payload, int* size, char** words, i
     return curr;
 }
 
-void send_words(int client_socket, char** words, int* size)
+unsigned char* send_words(char** words, int* size)
 {
 
     uint16_t* n_words = calloc(19, sizeof(uint16_t));
@@ -178,7 +179,6 @@ void send_words(int client_socket, char** words, int* size)
     int cant = 2;
     cant = add_words(first_card, sender, size, words, 9, cant, n_words, rep);
     add_words(second_card, sender, size, words, 10, cant, n_words, rep);
-    send(client_socket, sender, 2+payloadSize, 0);
     // int curr = 0;
     // printf("%d ", sender[0]);
     // printf("%d \n", sender[1]);
@@ -194,6 +194,15 @@ void send_words(int client_socket, char** words, int* size)
     // }
     free(first_card);
     free(second_card);
-    free(sender);
+    // free(sender);
     free(n_words);
+    return sender;
+}
+
+void server_connection_established(int client_socket)
+{
+  char msg[2];
+  msg[0] = 2;
+  // Se envía el paquete
+  send(client_socket, msg, 1, 0);
 }

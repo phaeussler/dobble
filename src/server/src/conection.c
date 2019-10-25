@@ -35,5 +35,13 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
   sockets_clients->socket_c1 = accept(server_socket, (struct sockaddr *)&client1_addr, &addr_size);
   sockets_clients->socket_c2 = accept(server_socket, (struct sockaddr *)&client2_addr, &addr_size);
 
+  int flags = fcntl(sockets_clients->socket_c1, F_GETFL, 0);
+
+  int err = fcntl(sockets_clients->socket_c1, F_SETFL, flags | O_NONBLOCK);
+
+  flags = fcntl(sockets_clients->socket_c2, F_GETFL, 0);
+
+  err = fcntl(sockets_clients->socket_c2, F_SETFL, flags | O_NONBLOCK);
+
   return sockets_clients;
 }

@@ -45,10 +45,10 @@ int main(int argc, char *argv[]){
 
   // Le enviamos al primer cliente un mensaje de bienvenida
   char * welcome = "Bienvenido Cliente 1!!";
-  server_send_message(players_info->sockets[0], 1, welcome);
+  server_send_message(players_info->players[0]->sockets, 1, welcome);
   
   // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->sockets[0], players_info->sockets[1]};
+  int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
   int my_attention = 0;
   while (1)
   {

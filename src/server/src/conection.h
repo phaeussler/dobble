@@ -9,8 +9,17 @@
 #include <netdb.h>
 #include "comunication.h"
 
+
+typedef struct player{
+  int score;
+  int sockets;
+  int win;
+  char* nickname;
+} Player;
+
 typedef struct players_info{
-  int* sockets;
+  Player** players;
+  int connected;
   // int* theads;
   // int socket_c1;
   // int socket_c2;

@@ -33,8 +33,9 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
   // socklen_t addr_size = sizeof(client1_addr);
 
   // Se inicializa una estructura propia para guardar los n°s de sockets de los clientes.
-  PlayersInfo * sockets_clients = malloc(sizeof(PlayersInfo));
-  sockets_clients ->sockets = calloc(MAX_CONNECTIONS, sizeof(int));
+  PlayersInfo * clients = malloc(sizeof(PlayersInfo));
+  clients -> players = malloc(MAX_CONNECTIONS* sizeof(Player));
+  clients -> connected = 0;
 
   // clock_t time_ready = 0;
   int rv;
@@ -48,30 +49,42 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
   for (int client = 0; client < MAX_CONNECTIONS; client++)
   {
     if (client <= 1){
-      sockets_clients->sockets[client] = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+      clients -> players[client] = malloc(sizeof(Player));
+      clients -> players[client] -> score = 0;
+      clients -> players[client] -> win = 0;
+      clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+      clients -> connected ++;
       timeout.tv_sec = MAX_TIME_WAIT_CONNECTIONS;
     }
     else{
       rv = select(server_socket+1, &set, NULL, NULL, &timeout);
       if(rv == -1){
         perror("select"); /* an error accured */
-        return sockets_clients;
+        return clients;
       }
       else if(rv == 0){
         printf("Starting the game: timeout occurred (%d second) \n", MAX_TIME_WAIT_CONNECTIONS); /* a timeout occured */
-        return sockets_clients;
+        return clients;
       }
       else
         // client_socket_fd = accept (server_socket,(struct sockaddr *) &client_name, &client_name_len);
-        sockets_clients->sockets[client] = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+        clients -> players[client] = malloc(sizeof(Player));
+        clients -> players[client] -> score = 0;
+        clients -> players[client] -> win = 0;
+        clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+        clients -> connected ++;
     }
     printf("The client %d is ready\n", client);
   }
-  return sockets_clients;
+  return clients;
 }
 
 
 void destroy_players_info(PlayersInfo* players_info){
-  free(players_info ->sockets);
+  for (int client = 0; client < players_info -> connected; client++)
+  {
+    free(players_info -> players[client]);
+  }
+  free(players_info -> players);
   free(players_info);
 }

@@ -18,6 +18,7 @@ char * get_input(){
 
 
 int main (int argc, char *argv[]){
+  printf("Iniciando Cliente\n");
   //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
   char * IP = "127.0.0.1";
   int PORT = 3000;

@@ -1,0 +1,5 @@
+#pragma once
+
+
+int MAX_CONNECTIONS;
+int MAX_TIME_WAIT_CONNECTIONS;

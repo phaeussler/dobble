@@ -10,8 +10,11 @@
 #include "comunication.h"
 
 typedef struct players_info{
-  int socket_c1;
-  int socket_c2;
+  int* sockets;
+  // int* theads;
+  // int socket_c1;
+  // int socket_c2;
 } PlayersInfo;
 
 PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port);
+void destroy_players_info(PlayersInfo* players_info);

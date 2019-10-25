@@ -19,6 +19,15 @@ char * revert(char * message){
   return response;
 }
 
+int waitting_clients(PlayersInfo* players)
+{
+  for(int i = 0; i < players->connected; i++)
+  {
+    if(!players->players[i]->waiting) return 0;
+  }
+  return 1;
+}
+
 
 int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
   char *help_mg = " ./server -i <ip_address> -p <tcp-port> [-l]";  // Correct Usage String
@@ -76,7 +85,7 @@ int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
 }
 
 int main(int argc, char *argv[]){
-  int debug = 0;
+  int debug = 1;
   char *IP;
   int PORT;
   uint8_t LOGG = 0;  // Si es 0, entonces no se hace logging, en otro caso si
@@ -89,7 +98,7 @@ int main(int argc, char *argv[]){
   else{
     if(load_input(&LOGG, &PORT, &IP, argc, argv)){return -1;}
   }
-  char* objective_word[50];
+  char objective_word[20];
   char** list = calloc(1001, sizeof(char*));
   for(int i = 0; i < 1001; i++){
     list[i] = calloc(21, sizeof(char));
@@ -115,25 +124,33 @@ int main(int argc, char *argv[]){
   // Le enviamos al primer cliente un mensaje de bienvenida
   
   // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
   int my_attention = 0;
   while (1)
   {
+    if(!waitting_clients(players_info)){
     // Se obtiene el paquete del cliente 1
-    int msg_code = server_receive_id(sockets_array[my_attention]);
+    int msg_code = server_receive_id(players_info->players[my_attention]->sockets);
 
     if (msg_code == 1)
     {
-      server_connection_established(sockets_array[my_attention]);
+      server_connection_established(players_info->players[my_attention]->sockets);
+      server_ask_nikname(players_info->players[my_attention]->sockets);
     }
+
     else if (msg_code == 2){
       if(!cards_defined)
       {
         cards = send_words(list, size);
         cards_defined = 1;  
       }
-      send(sockets_array[my_attention], cards, 2+cards[1], 0);
+      send(players_info->players[my_attention]->sockets, cards, 2+cards[1], 0);
     }
+
+    else if(msg_code == 4)
+    {
+      server_save_nickname(players_info->players[my_attention]);
+    }
+
     else if(msg_code == 20)
     {
       if(!cards_defined)
@@ -141,12 +158,19 @@ int main(int argc, char *argv[]){
         cards = send_words(list, size);
         cards_defined = 1;  
       }
-      send(sockets_array[my_attention], cards, 2+cards[1], 0);
+      send(players_info->players[my_attention]->sockets, cards, 2+cards[1], 0);
 
     }
     printf("------------------\n");
-    my_attention = (my_attention + 1) % 2;
+    if(my_attention + 1 < players_info->connected) my_attention++;
+    else my_attention = 0;
+    }
+    if(waitting_clients(players_info))
+    {
+      break;
+    }
   }
+  printf("%s\n %s\n", players_info->players[0]->nickname, players_info->players[1]->nickname);
   destroy_players_info(players_info);
 
   return 0;

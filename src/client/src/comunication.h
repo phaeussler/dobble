@@ -9,3 +9,4 @@ unsigned char * client_receive_payload(int client_socket);
 void client_start_conection(int client_socket);
 void print_cards(int server_socket);
 void client_request_cards(int client_socket);
+void client_send_nickname(int server_socket, char* nickname);

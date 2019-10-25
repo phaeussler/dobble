@@ -100,7 +100,8 @@ int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
 }
 
 int main(int argc, char *argv[]){
-  int debug = 0;
+  char nickname[50];
+  int debug = 1;
   char *IP;
   int PORT;
   uint8_t LOGG = 0;  // Si es 0, entonces no se hace logging, en otro caso si
@@ -124,7 +125,14 @@ int main(int argc, char *argv[]){
  
       printf("Conection established\n");
 
-      client_request_cards(server_socket);
+      // client_request_cards(server_socket);
+    }
+
+    else if(msg_code == 3)
+    {
+      printf("\nType your Nickname: ");
+      scanf("%s", nickname);
+      client_send_nickname(server_socket, nickname);
     }
 
     else if (msg_code == 9)

@@ -43,6 +43,8 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
   FD_ZERO(&set); /* clear the set */
   FD_SET(server_socket, &set); /* add our file descriptor to the set */
 
+  int flags, err;
+
   struct timeval timeout;
   timeout.tv_usec = 0;
   // Se aceptan a los primeros 2 clientes que lleguen. "accept" retorna el n° de otro socket asignado para la comunicación
@@ -53,6 +55,8 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
       clients -> players[client] -> score = 0;
       clients -> players[client] -> win = 0;
       clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+      flags = fcntl(clients->players[client]->sockets, F_GETFL, 0);
+      err = fcntl(clients->players[client]->sockets, F_SETFL, flags | O_NONBLOCK);
       clients -> connected ++;
       timeout.tv_sec = MAX_TIME_WAIT_CONNECTIONS;
     }
@@ -72,6 +76,8 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
         clients -> players[client] -> score = 0;
         clients -> players[client] -> win = 0;
         clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+        flags = fcntl(clients->players[client]->sockets, F_GETFL, 0);
+        err = fcntl(clients->players[client]->sockets, F_SETFL, flags | O_NONBLOCK);
         clients -> connected ++;
     }
     printf("The client %d is ready\n", client);

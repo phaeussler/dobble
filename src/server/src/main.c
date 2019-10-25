@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <string.h>
 #include "comunication.h"
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]){
   int PORT;
   uint8_t LOGG = 0;  // Si es 0, entonces no se hace logging, en otro caso si
   // Se define una IP y un puerto
+  printf("Iniciando Servidor\n");
   if(debug){
     IP = "127.0.0.1";
     PORT = 3000;
@@ -87,7 +89,6 @@ int main(int argc, char *argv[]){
   else{
     if(load_input(&LOGG, &PORT, &IP, argc, argv)){return -1;}
   }
-  
   char* objective_word[50];
   char** list = calloc(1001, sizeof(char*));
   for(int i = 0; i < 1001; i++){
@@ -104,51 +105,49 @@ int main(int argc, char *argv[]){
     cant++;
   }
 
+  unsigned char* cards;
+  int cards_defined = 0;
+
 
   // Se crea el servidor y se obtienen los sockets de ambos clientes.
   PlayersInfo * players_info = prepare_sockets_and_get_clients(IP, PORT);
 
   // Le enviamos al primer cliente un mensaje de bienvenida
-  char * welcome = "Bienvenido Cliente 1!!";
-  server_send_message(players_info->socket_c1, 1, welcome);
   
   // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->socket_c1, players_info->socket_c2};
+  int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
   int my_attention = 0;
   while (1)
   {
     // Se obtiene el paquete del cliente 1
     int msg_code = server_receive_id(sockets_array[my_attention]);
 
-    if (msg_code == 1) //El cliente me envió un mensaje a mi (servidor)
+    if (msg_code == 1)
     {
-      char * client_message = server_receive_payload(sockets_array[my_attention]);
-      printf("El cliente %d dice: %s\n", my_attention+1, client_message);
-      
-      // Le enviaremos el mismo mensaje invertido jeje
-      char * response = revert(client_message);
-      
-      // Le enviamos la respuesta
-      server_send_message(sockets_array[my_attention], 1, response);
+      server_connection_established(sockets_array[my_attention]);
     }
-    else if (msg_code == 2){ //El cliente le envía un mensaje al otro cliente
-      char * client_message = server_receive_payload(sockets_array[my_attention]);
-      printf("Servidor traspasando desde %d a %d el mensaje: %s\n", my_attention+1, ((my_attention+1)%2)+1, client_message);
-      
-      // Mi atención cambia al otro socket
-      my_attention = (my_attention + 1) % 2;
-      
-      server_send_message(sockets_array[my_attention], 2, client_message); 
+    else if (msg_code == 2){
+      if(!cards_defined)
+      {
+        cards = send_words(list, size);
+        cards_defined = 1;  
+      }
+      send(sockets_array[my_attention], cards, 2+cards[1], 0);
     }
-    else if(msg_code == 3)
+    else if(msg_code == 20)
     {
+      if(!cards_defined)
+      {
+        cards = send_words(list, size);
+        cards_defined = 1;  
+      }
+      send(sockets_array[my_attention], cards, 2+cards[1], 0);
 
-      send_words(sockets_array[my_attention], list, size);
-
-      my_attention = (my_attention + 1) % 2;
     }
     printf("------------------\n");
+    my_attention = (my_attention + 1) % 2;
   }
+  destroy_players_info(players_info);
 
   return 0;
 }

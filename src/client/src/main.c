@@ -44,14 +44,7 @@ int connect_to_server(char* IP, int PORT)
   
 }
 
-
-
-int main (int argc, char *argv[]){
-  printf("Iniciando Cliente\n");
-  //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
-  char * IP = "127.0.0.1";
-  int PORT = 3000;
-  int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
+int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
   char *help_mg = " ./server -i <ip_address> -p <tcp-port> [-l]";  // Correct Usage String
   char *ip_flag =                                         "-i";  // Flag for ip address
   char *pt_flag =                                         "-p";  // flag for port

@@ -10,9 +10,21 @@
 #include <fcntl.h>
 #include "comunication.h"
 
+
+typedef struct player{
+  int score;
+  int sockets;
+  int win;
+  char* nickname;
+} Player;
+
 typedef struct players_info{
-  int socket_c1;
-  int socket_c2;
+  Player** players;
+  int connected;
+  // int* theads;
+  // int socket_c1;
+  // int socket_c2;
 } PlayersInfo;
 
 PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port);
+void destroy_players_info(PlayersInfo* players_info);

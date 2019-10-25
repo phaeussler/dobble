@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "comunication.h"
 #include "conection.h"
 
@@ -19,7 +20,7 @@ char * revert(char * message){
 
 int main(int argc, char *argv[]){
   // Se define una IP y un puerto
-
+  printf("Iniciando Servidor\n");
   char* objective_word[50];
   char** list = calloc(1001, sizeof(char*));
   for(int i = 0; i < 1001; i++){
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]){
   // Le enviamos al primer cliente un mensaje de bienvenida
   
   // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->socket_c1, players_info->socket_c2};
+  int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
   int my_attention = 0;
   while (1)
   {
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]){
     printf("------------------\n");
     my_attention = (my_attention + 1) % 2;
   }
+  destroy_players_info(players_info);
 
   return 0;
 }

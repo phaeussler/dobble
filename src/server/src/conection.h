@@ -16,6 +16,8 @@ typedef struct player{
   int sockets;
   int win;
   char* nickname;
+  int remaining;
+  int waiting;
 } Player;
 
 typedef struct players_info{

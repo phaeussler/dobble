@@ -54,6 +54,8 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
       clients -> players[client] = malloc(sizeof(Player));
       clients -> players[client] -> score = 0;
       clients -> players[client] -> win = 0;
+      clients -> players[client] -> remaining = 3;
+      clients -> players[client] -> waiting = 0;
       clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
       flags = fcntl(clients->players[client]->sockets, F_GETFL, 0);
       err = fcntl(clients->players[client]->sockets, F_SETFL, flags | O_NONBLOCK);
@@ -75,6 +77,8 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
         clients -> players[client] = malloc(sizeof(Player));
         clients -> players[client] -> score = 0;
         clients -> players[client] -> win = 0;
+        clients -> players[client] -> remaining = 3;
+        clients -> players[client] -> waiting = 0;
         clients -> players[client] -> sockets = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
         flags = fcntl(clients->players[client]->sockets, F_GETFL, 0);
         err = fcntl(clients->players[client]->sockets, F_SETFL, flags | O_NONBLOCK);

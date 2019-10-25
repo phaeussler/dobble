@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
     
     if (msg_code == 2) {
  
-      printf("Conction established\n");
+      printf("Conection established\n");
 
       client_request_cards(server_socket);
     }

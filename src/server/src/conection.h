@@ -1,6 +1,7 @@
 #pragma once
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/socket.h>
@@ -9,7 +10,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
-#include "comunication.h"
 
 
 typedef struct player{
@@ -19,6 +19,7 @@ typedef struct player{
   char* nickname;
   int remaining;
   int waiting;
+  int last_code;
 } Player;
 
 typedef struct players_info{

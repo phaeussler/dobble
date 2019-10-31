@@ -1,5 +1,6 @@
 #include "comunication.h"
 
+
 int server_receive_id(int client_socket){
   // Se obtiene solamente el ID del mensaje
   int id = 0;
@@ -205,4 +206,45 @@ void server_connection_established(int client_socket)
   msg[0] = 2;
   // Se envía el paquete
   send(client_socket, msg, 1, 0);
+}
+
+void server_ask_nikname(Player* player)
+{
+  char msg[2];
+  msg[0] = 3;
+  // Se envía el paquete
+  send(player->socket, msg, 1, 0);
+}
+
+void server_save_nickname(Player* player)
+{
+  int len = 0;
+  recv(player->socket, &len, 1, 0);
+  printf("guardo nick\n");
+  player->nickname = malloc(len);
+  int received = recv(player->socket, player->nickname, len, 0);
+  player->waiting = 0;
+}
+
+void server_oponent_found(PlayersInfo * players_info)
+{
+  char msg[2];
+  msg[0] = 5;
+  // Se envía el paquete
+  for (int i = 0; i < players_info->connected; i++)
+  {
+    send(players_info->players[i]->socket, msg, 1, 0);
+  }
+}
+
+
+void server_start_game(PlayersInfo * players_info)
+{
+  char msg[2];
+  msg[0] = 7;
+  // Se envía el paquete
+  for (int i = 0; i < players_info->connected; i++)
+  {
+    send(players_info->players[i]->socket, msg, 1, 0);
+  }
 }

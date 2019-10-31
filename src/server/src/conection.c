@@ -53,10 +53,12 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
     if (client <= 1){
       clients -> players[client] = malloc(sizeof(Player));
       clients -> players[client] -> score = 0;
+      clients -> players[client] -> nickname = NULL;
       clients -> players[client] -> win = 0;
       clients -> players[client] -> remaining = 3;
       clients -> players[client] -> waiting = 0;
       clients -> players[client] -> socket = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+      clients -> players[client] -> last_code = 0;
       flags = fcntl(clients->players[client]->socket, F_GETFL, 0);
       err = fcntl(clients->players[client]->socket, F_SETFL, flags | O_NONBLOCK);
       clients -> connected ++;
@@ -73,16 +75,20 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
         return clients;
       }
       else
+      {
         // client_socket_fd = accept (server_socket,(struct sockaddr *) &client_name, &client_name_len);
         clients -> players[client] = malloc(sizeof(Player));
         clients -> players[client] -> score = 0;
+        clients -> players[client] -> nickname = NULL;
         clients -> players[client] -> win = 0;
         clients -> players[client] -> remaining = 3;
         clients -> players[client] -> waiting = 0;
         clients -> players[client] -> socket = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
+        clients -> players[client] -> last_code = 0;
         flags = fcntl(clients->players[client]->socket, F_GETFL, 0);
         err = fcntl(clients->players[client]->socket, F_SETFL, flags | O_NONBLOCK);
         clients -> connected ++;
+      }
     }
     printf("The client %d is ready\n", client);
   }
@@ -93,6 +99,7 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
 void destroy_players_info(PlayersInfo* players_info){
   for (int client = 0; client < players_info -> connected; client++)
   {
+    if(players_info->players[client]->nickname) free(players_info->players[client]->nickname);
     free(players_info -> players[client]);
   }
   free(players_info -> players);

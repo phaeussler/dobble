@@ -134,3 +134,15 @@ void print_cards(int server_socket)
   free(first_card);
   free(second_card);
 }
+
+void client_send_nickname(int server_socket, char* nickname)
+{
+  int payloadSize = strlen(nickname) + 1; 
+  
+  char msg[1+1+payloadSize];
+  msg[0] = 4;
+  msg[1] = payloadSize;
+  memcpy(&msg[2], nickname, payloadSize);
+
+  send(server_socket, msg, 2+payloadSize, 0);
+}

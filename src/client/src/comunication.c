@@ -44,7 +44,7 @@ void client_request_cards(int client_socket)
 {
   
   char msg[2];
-  msg[0] = 20;
+  msg[0] = 9;
   // Se envía el paquete
   send(client_socket, msg, 1, 0);
 }

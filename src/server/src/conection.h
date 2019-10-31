@@ -1,3 +1,4 @@
+#pragma once
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@
 
 typedef struct player{
   int score;
-  int sockets;
+  int socket;
   int win;
   char* nickname;
   int remaining;

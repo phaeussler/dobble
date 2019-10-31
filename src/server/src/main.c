@@ -6,6 +6,8 @@
 #include <string.h>
 #include "comunication.h"
 #include "conection.h"
+#include "response.h"
+#include "globals.h"
 
 char * revert(char * message){
   int len = strlen(message) + 1;
@@ -75,6 +77,8 @@ int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
   return -5;
 }
 
+
+
 int main(int argc, char *argv[]){
   int debug = 0;
   char *IP;
@@ -89,25 +93,8 @@ int main(int argc, char *argv[]){
   else{
     if(load_input(&LOGG, &PORT, &IP, argc, argv)){return -1;}
   }
-  char* objective_word[50];
-  char** list = calloc(1001, sizeof(char*));
-  for(int i = 0; i < 1001; i++){
-    list[i] = calloc(21, sizeof(char));
-  }
-  int* size = calloc(1001, sizeof(int));
-  FILE* test = fopen("palabras.txt", "r");
-  int cant = 0;
-  int aux_size;
-  char aux_word[100];
-  while(cant < 1001 && fscanf(test, "%d,%s", &size[cant], aux_word) != EOF)
-  {
-    strcpy(list[cant], aux_word);
-    cant++;
-  }
-
-  unsigned char* cards;
-  int cards_defined = 0;
-
+  
+  set_words();
 
   // Se crea el servidor y se obtienen los sockets de ambos clientes.
   PlayersInfo * players_info = prepare_sockets_and_get_clients(IP, PORT);
@@ -115,37 +102,16 @@ int main(int argc, char *argv[]){
   // Le enviamos al primer cliente un mensaje de bienvenida
   
   // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
+  // int sockets_array[2] = {players_info->players[0]->sockets, players_info->players[1]->sockets};
   int my_attention = 0;
   while (1)
   {
+    /* revisar: https://stackoverflow.com/questions/19794764/linux-socket-how-to-make-send-wait-for-recv */
     // Se obtiene el paquete del cliente 1
-    int msg_code = server_receive_id(sockets_array[my_attention]);
-
-    if (msg_code == 1)
-    {
-      server_connection_established(sockets_array[my_attention]);
-    }
-    else if (msg_code == 2){
-      if(!cards_defined)
-      {
-        cards = send_words(list, size);
-        cards_defined = 1;  
-      }
-      send(sockets_array[my_attention], cards, 2+cards[1], 0);
-    }
-    else if(msg_code == 20)
-    {
-      if(!cards_defined)
-      {
-        cards = send_words(list, size);
-        cards_defined = 1;  
-      }
-      send(sockets_array[my_attention], cards, 2+cards[1], 0);
-
-    }
+    int msg_code = server_receive_id(players_info -> players[my_attention] -> socket);
+    handle_message(players_info, my_attention, msg_code);
     printf("------------------\n");
-    my_attention = (my_attention + 1) % 2;
+    my_attention = (my_attention + 1) % players_info ->connected;
   }
   destroy_players_info(players_info);
 

@@ -100,6 +100,7 @@ void destroy_players_info(PlayersInfo* players_info){
   for (int client = 0; client < players_info -> connected; client++)
   {
     if(players_info->players[client]->nickname) free(players_info->players[client]->nickname);
+    close(players_info->players[client]->socket);
     free(players_info -> players[client]);
   }
   free(players_info -> players);

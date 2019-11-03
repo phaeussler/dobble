@@ -78,10 +78,7 @@ void server_send_cards(PlayersInfo * players_info){
 
 
 void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
-  if (msg_code){
-    players_info -> players[my_attention] -> last_code = msg_code;
-    printf("SET player: %d code: %d\n", my_attention, players_info->players[my_attention]->last_code);
-  }
+
   /* Recibe el mensaje y busca la función correspondiente al mensaje */
   if (msg_code == 1){
   /* Start Connection */
@@ -102,8 +99,9 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
     if(!waitting_clients(players_info)){
       printf("Send oponent found\n");
       server_oponent_found(players_info);
+      server_send_ids(players_info);
       server_start_game(players_info);
-      /* SEND SCORE */
+      server_send_scores(players_info);
       server_send_cards(players_info);
     }
   }

@@ -7,6 +7,13 @@ int client_receive_id(int client_socket){
   return id;
 }
 
+int client_payload_len(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  return len;
+}
+
 unsigned char * client_receive_payload(int client_socket){
   // Se obtiene el largo del payload
   int len = 0;
@@ -145,4 +152,32 @@ void client_send_nickname(int server_socket, char* nickname)
   memcpy(&msg[2], nickname, payloadSize);
 
   send(server_socket, msg, 2+payloadSize, 0);
+}
+
+void print_scores(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  unsigned char * payload = calloc(len, 1);
+  int received = recv(client_socket, payload, len, 0);
+
+  printf("\n My score: %d", payload[0]);
+  printf("\n Oponent(s) score: ");
+  for(int i = 1; i < len; i++)
+  {
+    printf("\n - %d", payload[i]);
+  }
+
+  free(payload);
+}
+
+int client_recieve_myid(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  int id = 0;
+  recv(client_socket, &id, 1, 0);
+  return id;
 }

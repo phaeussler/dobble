@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
     int msg_code = client_receive_id(server_socket);
     
     if (msg_code == 2) {
- 
+      client_payload_len(server_socket);
       printf("Conection established\n");
 
       // client_request_cards(server_socket);
@@ -130,6 +130,7 @@ int main(int argc, char *argv[]){
 
     else if(msg_code == 3)
     {
+      client_payload_len(server_socket);
       printf("\nType your Nickname: ");
       scanf("%s", nickname);
       client_send_nickname(server_socket, nickname);
@@ -137,11 +138,19 @@ int main(int argc, char *argv[]){
 
     else if(msg_code == 5)
     {
+      client_payload_len(server_socket);
       printf("\nOponent found: ");
+    }
+
+    else if(msg_code == 6)
+    {
+      int myId = client_recieve_myid(server_socket);
+      printf("\nMy id: %d\n", myId);
     }
 
     else if(msg_code == 7)
     {
+      client_payload_len(server_socket);
       printf("\nStart game: ");
       /* Seteo el timer */
     }
@@ -151,7 +160,12 @@ int main(int argc, char *argv[]){
     {
       print_cards(server_socket);
     }
-    printf("------------------\n");
+
+    else if(msg_code == 8)
+    {
+      print_scores(server_socket);
+    }
+    // printf("------------------\n");
   }
 
   // Se cierra el socket

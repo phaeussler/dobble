@@ -16,3 +16,5 @@ void server_ask_nikname(Player* player);
 void server_save_nickname(Player* player);
 void server_oponent_found(PlayersInfo * players_info);
 void server_start_game(PlayersInfo * players_info);
+void server_send_ids(PlayersInfo* players_info);
+void server_send_scores(PlayersInfo* players_info);

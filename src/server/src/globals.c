@@ -27,4 +27,5 @@ void set_words(){
     strcpy(words[cant], aux_word);
     cant++;
   }
+  fclose(test);
 }

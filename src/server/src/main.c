@@ -109,17 +109,12 @@ int main(int argc, char *argv[]){
   while (1)
   {
     int msg_code = server_receive_id(players_info->players[my_attention]->socket);
-    if (!(players_info->players[my_attention]->last_code == msg_code)){
-      handle_message(players_info, my_attention, msg_code);
-    }
-    else{
-      printf("player: %d code: %d\n", my_attention, players_info->players[my_attention]->last_code);
-    }
+    if(msg_code) handle_message(players_info, my_attention, msg_code);
+
     // printf("------------------\n");
-    if(!waitting_clients(players_info)){
-      if(my_attention + 1 < players_info->connected) my_attention++;
-      else my_attention = 0;
-    }
+    if(my_attention + 1 < players_info->connected) my_attention++;
+    else my_attention = 0;
+    if(!waitting_clients(players_info)) break;
     // if(waitting_clients(players_info))
     // {
     //   printf("Esperando cliente\n");
@@ -128,6 +123,12 @@ int main(int argc, char *argv[]){
   }
   printf("%s\n %s\n", players_info->players[0]->nickname, players_info->players[1]->nickname);
   destroy_players_info(players_info);
+  free(cards);
+  for(int i = 0; i < 1001; i++){
+    free(words[i]);
+  }
+  free(words);
+  free(size);
 
   return 0;
 }

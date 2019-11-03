@@ -204,16 +204,18 @@ void server_connection_established(int client_socket)
 {
   char msg[2];
   msg[0] = 2;
+  msg[1] = 1;
   // Se envía el paquete
-  send(client_socket, msg, 1, 0);
+  send(client_socket, msg, 2, 0);
 }
 
 void server_ask_nikname(Player* player)
 {
   char msg[2];
   msg[0] = 3;
+  msg[1] = 1;
   // Se envía el paquete
-  send(player->socket, msg, 1, 0);
+  send(player->socket, msg, 2, 0);
 }
 
 void server_save_nickname(Player* player)
@@ -223,17 +225,18 @@ void server_save_nickname(Player* player)
   printf("guardo nick\n");
   player->nickname = malloc(len);
   int received = recv(player->socket, player->nickname, len, 0);
-  player->waiting = 0;
+  player->waiting = 1;
 }
 
 void server_oponent_found(PlayersInfo * players_info)
 {
   char msg[2];
   msg[0] = 5;
+  msg[1] = 0;
   // Se envía el paquete
   for (int i = 0; i < players_info->connected; i++)
   {
-    send(players_info->players[i]->socket, msg, 1, 0);
+    send(players_info->players[i]->socket, msg, 2, 0);
   }
 }
 
@@ -242,9 +245,48 @@ void server_start_game(PlayersInfo * players_info)
 {
   char msg[2];
   msg[0] = 7;
+  msg[1] = 0;
   // Se envía el paquete
   for (int i = 0; i < players_info->connected; i++)
   {
-    send(players_info->players[i]->socket, msg, 1, 0);
+    send(players_info->players[i]->socket, msg, 2, 0);
   }
+}
+
+void server_send_ids(PlayersInfo* players_info)
+{
+    
+    for (int i = 0; i < players_info->connected; i++)
+    {
+        unsigned char msg[3];
+        msg[0] = 6;
+        msg[1] = 1;
+        msg[2] = i + 1;
+        send(players_info->players[i]->socket, msg, 3, 0);
+    }
+}
+
+void server_send_scores(PlayersInfo* players_info)
+{
+    int n_players = players_info->connected;
+    char* sender = calloc(1 + 1 + n_players, 1);
+    sender[0] = 8;
+    sender[1] = n_players;
+    int curr = 2;
+    for(int i = 0; i < n_players; i++)
+    {
+        sender[curr] = players_info->players[i]->score;
+        curr++;
+        for(int j = 0; j < n_players; j++)
+        {
+            if(i != j)
+            {
+                sender[curr] = players_info->players[i]->score;
+                curr++;
+            }
+        }
+        send(players_info->players[i]->socket, sender, 2 + n_players, 0);
+        curr = 2;
+    }
+    free(sender);
 }

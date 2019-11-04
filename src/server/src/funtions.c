@@ -12,3 +12,11 @@ int waitting_clients(PlayersInfo* players)
   }
   return 0;
 }
+
+void take_waitting(PlayersInfo* players)
+{
+  for(int i = 0; i < players->connected; i++)
+  {
+    players->players[i]->waiting = 0;
+  }
+}

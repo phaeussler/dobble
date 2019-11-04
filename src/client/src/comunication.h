@@ -13,3 +13,8 @@ void client_send_nickname(int server_socket, char* nickname);
 void print_scores(int client_socket);
 int client_recieve_myid(int client_socket);
 int client_payload_len(int client_socket);
+void client_send_obj_word(int server_socket, char* word);
+void recieve_correct_answer(int client_socket);
+void client_recieve_round_winners(int client_socket, int myId);
+void client_recive_end_game(int client_socket);
+void client_recive_game_winner(int client_socket, int myId);

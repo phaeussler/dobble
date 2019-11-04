@@ -181,3 +181,86 @@ int client_recieve_myid(int client_socket)
   recv(client_socket, &id, 1, 0);
   return id;
 }
+
+void client_send_obj_word(int server_socket, char* word)
+{
+  int payloadSize = strlen(word) + 1; 
+  
+  char msg[1+1+payloadSize];
+  msg[0] = 10;
+  msg[1] = payloadSize;
+  memcpy(&msg[2], word, payloadSize);
+
+  send(server_socket, msg, 2+payloadSize, 0);
+}
+
+void recieve_correct_answer(int client_socket)
+{
+  int len = 0;
+  int intentos = 0;
+  int correct = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  recv(client_socket, &correct, 1, 0);
+  recv(client_socket, &intentos, 1, 0);
+  if(correct) printf("The answer is correct!!\n");
+  else printf("Incorrect answer! You have %d more attempts\n", intentos);
+
+}
+
+void client_recieve_round_winners(int client_socket, int myId)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  unsigned int* payload = calloc(10, sizeof(unsigned int));
+  for(int i = 0; i < len; i++)
+  {
+    recv(client_socket, &payload[i], 1, 0);
+  }
+  
+  int first_val = 1;
+  first_val = payload[0];
+  if(len == 1 && !first_val) printf("All players tie\n");
+  else
+  {
+    for(int i = 0; i < len; i++)
+    {
+      if(myId == (payload[i])) printf("Congratulations, you won this round\n");
+    }
+    for(int i = 0; i < len; i++)
+    {
+      if(myId != (payload[i])) printf("Player %d won this round\n", payload[i]);
+    }
+  }
+  free(payload);
+}
+
+void client_recive_end_game(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  int game = 0;
+  recv(client_socket, &game, 1, 0);
+  printf("Game n°%d has ended\n", game);
+}
+
+void client_recive_game_winner(int client_socket, int myId)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  // Se obtiene el payload
+  unsigned int* winners = calloc(len, sizeof(unsigned int));
+  recv(client_socket, winners, len, 0);
+  int i_winner = 0;
+  for(int i = 0; i < len; i++)
+  {
+    if((int)winners[i] == myId) i_winner++;
+  }
+  
+  if(i_winner > 0) printf("Congratulations!! you won the game\n");
+  else printf("You lost the game, better luck next time\n");
+
+  free(winners);
+}

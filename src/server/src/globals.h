@@ -11,5 +11,8 @@ unsigned char* cards;
 int cards_defined;
 char** words;
 int* size;
+char* obj_word;
+int rounds;
+int games;
 
 void set_words();

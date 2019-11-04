@@ -101,9 +101,11 @@ int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
 
 int main(int argc, char *argv[]){
   char nickname[50];
+  char answer_word[21];
   int debug = 1;
   char *IP;
   int PORT;
+  int myId = 0;
   uint8_t LOGG = 0;  // Si es 0, entonces no se hace logging, en otro caso si
   // Se define una IP y un puerto
   if(debug){
@@ -144,7 +146,7 @@ int main(int argc, char *argv[]){
 
     else if(msg_code == 6)
     {
-      int myId = client_recieve_myid(server_socket);
+      myId = client_recieve_myid(server_socket);
       printf("\nMy id: %d\n", myId);
     }
 
@@ -159,11 +161,34 @@ int main(int argc, char *argv[]){
     else if (msg_code == 9)
     {
       print_cards(server_socket);
+      printf("\nWhich word is repeated?: ");
+      scanf("%s", answer_word);
+      client_send_obj_word(server_socket, answer_word);
     }
 
     else if(msg_code == 8)
     {
       print_scores(server_socket);
+    }
+
+    else if(msg_code == 11)
+    {
+      recieve_correct_answer(server_socket);
+    }
+
+    else if(msg_code == 12)
+    {
+      client_recieve_round_winners(server_socket, myId);
+    }
+
+    else if(msg_code == 13)
+    {
+      client_recive_end_game(server_socket);
+    }
+
+    else if(msg_code == 14)
+    {
+      client_recive_game_winner(server_socket, myId);
     }
     // printf("------------------\n");
   }

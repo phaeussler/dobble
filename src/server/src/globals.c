@@ -9,11 +9,15 @@ unsigned char* cards;
 int cards_defined = 0;
 char** words;
 int* size;
+char* obj_word;
+int rounds;
+int games = 1;
 
 
 void set_words(){
 //   char* objective_word[50];
   words = calloc(1001, sizeof(char*));
+  obj_word = calloc(21, 1);
   for(int i = 0; i < 1001; i++){
     words[i] = calloc(21, sizeof(char));
   }

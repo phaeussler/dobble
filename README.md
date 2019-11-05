@@ -7,15 +7,15 @@
 5. ~~Opponent Found~~
 6. ~~Send IDs~~
 7. ~~Start Game~~
-8. ~~Scores: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
+8. ~~Scores~~: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
 9. ~~Send Cards~~
 10. ~~Send Word~~
 11. ~~Response Word~~
-12. ~~~~Round Winner/Loser~~: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
+12. ~~Round Winner/Loser~~ : El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
 13. ~~End Game~~
 14. ~~Game Winner/Loser~~: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
 15. ~~Ask New Game~~
 16. ~~Answer New Game~~
 17. ~~Disconnect~~
-20. ~~Error Bad Package~~
+18. ~~Error Bad Package~~
 

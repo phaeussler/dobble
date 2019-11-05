@@ -14,5 +14,6 @@ int* size;
 char* obj_word;
 int rounds;
 int games;
+int end_games;
 
 void set_words();

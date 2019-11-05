@@ -223,7 +223,6 @@ void server_save_nickname(Player* player)
 {
   int len = 0;
   recv(player->socket, &len, 1, 0);
-  printf("guardo nick\n");
   player->nickname = malloc(len);
   int received = recv(player->socket, player->nickname, len, 0);
   player->waiting = 1;
@@ -242,15 +241,16 @@ void server_oponent_found(PlayersInfo * players_info)
 }
 
 
-void server_start_game(PlayersInfo * players_info)
+void server_start_game(PlayersInfo * players_info, int game)
 {
-  char msg[2];
+  char msg[3];
   msg[0] = 7;
-  msg[1] = 0;
+  msg[1] = 1;
+  msg[2] = game;
   // Se envía el paquete
   for (int i = 0; i < players_info->connected; i++)
   {
-    send(players_info->players[i]->socket, msg, 2, 0);
+    send(players_info->players[i]->socket, msg, 3, 0);
   }
 }
 
@@ -276,13 +276,13 @@ void server_send_scores(PlayersInfo* players_info)
     int curr = 2;
     for(int i = 0; i < n_players; i++)
     {
-        sender[curr] = players_info->players[i]->score;
+        sender[curr] = players_info->players[i]->win;
         curr++;
         for(int j = 0; j < n_players; j++)
         {
             if(i != j)
             {
-                sender[curr] = players_info->players[i]->score;
+                sender[curr] = players_info->players[j]->win;
                 curr++;
             }
         }
@@ -370,6 +370,42 @@ void server_send_game_winner(PlayersInfo* players, int* winners, int n_winners)
     for(int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 2 + senders, 0);
+    }
+    free(msg);
+}
+
+void server_ask_new_game(PlayersInfo* players)
+{
+    unsigned char* msg = calloc(2, 1);
+    msg[0] = 15;
+    msg[1] = 0;
+
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2, 0);
+    }
+    free(msg);
+}
+
+void server_get_new_game_response(Player* player)
+{
+    int len = 0;
+    int answer = 0;
+    recv(player->socket, &len, 1, 0);
+    recv(player->socket, &answer, len, 0);
+    if(answer) player->new_game = 1;
+    else player->new_game = -1;
+}
+
+void server_send_disconect(PlayersInfo* players)
+{
+    unsigned char* msg = calloc(2, 1);
+    msg[0] = 17;
+    msg[1] = 0;
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2, 0);
+        close(players->players[i]->socket);
     }
     free(msg);
 }

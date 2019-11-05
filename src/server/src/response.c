@@ -77,7 +77,6 @@ int get_round_winner(PlayersInfo* players, int* winners)
   {
     if(players->players[i]->score >= big) 
     {
-      players->players[i]->win++;
       winners[n_winners] = i;
       n_winners++;
     }
@@ -110,6 +109,14 @@ void reset_score_and_remaining(PlayersInfo* players)
   {
     players->players[i]->score = 0;
     players->players[i]->remaining = 3;
+  }
+}
+
+void reset_wins(PlayersInfo* players)
+{
+  for(int i = 0; i < players->connected; i++)
+  {
+    players->players[i]->win = 0;
   }
 }
 
@@ -164,7 +171,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
       printf("Send oponent found\n");
       server_oponent_found(players_info);
       server_send_ids(players_info);
-      server_start_game(players_info);
+      server_start_game(players_info, games);
       server_send_scores(players_info);
       server_send_cards(players_info);
       take_waitting(players_info);
@@ -203,6 +210,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
     {
       players_info->players[my_attention]->waiting = 1;
       players_info->players[my_attention]->score += 5 - (3 - remainings)*2;
+      players_info->players[my_attention]->win += 5 - (3 - remainings)*2;
       server_send_response_word(players_info->players[my_attention], correct, remainings - 1);
     }
     else
@@ -217,6 +225,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
       {
         players_info->players[my_attention]->waiting = 1;
         players_info->players[my_attention]->score += 0;
+        players_info->players[my_attention]->win += 0;
         server_send_response_word(players_info->players[my_attention], correct, 0);
       }
 
@@ -233,6 +242,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
       cards_defined = 0;
       if(rounds < 5)
       {
+        server_send_scores(players_info);
         server_send_cards(players_info);
       }
       else
@@ -242,15 +252,13 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
         n_game_winners = get_game_winner(players_info, game_winners);
         server_send_end_game(players_info, games);
         server_send_game_winner(players_info, game_winners, n_game_winners);
+        reset_wins(players_info);
         games++;
+        server_ask_new_game(players_info);
       }
       
     }
     free(ans);
-
-
-    
-    
 
   }
   else if (msg_code == 11){
@@ -275,6 +283,19 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
   }
   else if (msg_code == 16){
     /* Answer New Game */
+    server_get_new_game_response(players_info->players[my_attention]);
+    if(new_game_players(players_info) == 1)
+    {
+      rounds = 0;
+      server_start_game(players_info, games);
+      server_send_scores(players_info);
+      server_send_cards(players_info);
+    }
+    else if(new_game_players(players_info) == -1)
+    {
+      server_send_disconect(players_info);
+      end_games = 1;
+    }
 
   }
   else if (msg_code == 17){

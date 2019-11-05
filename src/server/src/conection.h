@@ -20,6 +20,7 @@ typedef struct player{
   int remaining;
   int waiting;
   int last_code;
+  int new_game;
 } Player;
 
 typedef struct players_info{

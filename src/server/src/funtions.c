@@ -6,7 +6,6 @@ int waitting_clients(PlayersInfo* players)
   for(int i = 0; i < players->connected; i++)
   {
     if(!players->players[i]->waiting){
-      printf("Waiting client: %d\n", i);
       return 1;
     }
   }
@@ -19,4 +18,17 @@ void take_waitting(PlayersInfo* players)
   {
     players->players[i]->waiting = 0;
   }
+}
+
+int new_game_players(PlayersInfo* players)
+{
+  int responses = 0;
+  for(int i = 0; i < players->connected; i++)
+  {
+    if(players->players[i]->new_game == 1) responses++;
+    else if(players->players[i]->new_game == -1) return -1;
+  }
+
+  if(responses == players->connected) return 1;
+  else return 0;
 }

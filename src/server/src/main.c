@@ -115,6 +115,8 @@ int main(int argc, char *argv[]){
     // printf("------------------\n");
     if(my_attention + 1 < players_info->connected) my_attention++;
     else my_attention = 0;
+
+    if(end_games) break;
     // if(!waitting_clients(players_info)) break;
     // if(waitting_clients(players_info))
     // {

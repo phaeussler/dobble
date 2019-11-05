@@ -18,6 +18,22 @@ char * get_input(){
   return response;
 }
 
+int get_new_game_response()
+{
+  char ans[50];
+  while(1)
+  {
+    printf("Do you want to play a new game?\n");
+    printf("1) Yes\n2) No\n");
+    scanf("%s", ans);
+    if(!strcmp(ans, "1") || !strcmp(ans, "2")) break;
+    else printf("Wrong answer! Please try again\n");
+  }
+  int real_ans = atoi(ans);
+  if(real_ans == 1) return 1;
+  else return 0;
+}
+
 int connect_to_server(char* IP, int PORT)
 {
   char doing[10];
@@ -190,12 +206,27 @@ int main(int argc, char *argv[]){
     {
       client_recive_game_winner(server_socket, myId);
     }
+
+    else if(msg_code == 15)
+    {
+      int play_new_game = 0;
+      play_new_game = get_new_game_response();
+      client_response_new_game(server_socket, play_new_game);
+    }
+
+    else if(msg_code == 17)
+    {
+      client_payload_len(server_socket);
+      printf("Disconected\n");
+      break;
+
+    }
     // printf("------------------\n");
   }
 
   // Se cierra el socket
   close(server_socket);
-  free(IP);
+  // free(IP);
 
   return 0;
 }

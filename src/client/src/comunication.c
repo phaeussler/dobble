@@ -264,3 +264,13 @@ void client_recive_game_winner(int client_socket, int myId)
 
   free(winners);
 }
+
+void client_response_new_game(int server_socket, int answer)
+{ 
+  char msg[3];
+  msg[0] = 16;
+  msg[1] = 1;
+  msg[2] = answer;
+
+  send(server_socket, msg, 3, 0);
+}

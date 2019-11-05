@@ -12,6 +12,7 @@ int* size;
 char* obj_word;
 int rounds;
 int games = 1;
+int end_games = 0;
 
 
 void set_words(){

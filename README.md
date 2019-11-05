@@ -3,7 +3,7 @@
 1. ~~Start Connection~~
 2. ~~Connection Established~~
 3. ~~Ask Nickname~~
-4. ~~Return Nickname~~
+4. Return Nickname: El payload sera igual a los nicknames de sus oponentes(por arreglar)
 5. ~~Opponent Found~~
 6. ~~Send IDs~~
 7. ~~Start Game~~

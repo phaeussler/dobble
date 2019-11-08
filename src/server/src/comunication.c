@@ -8,6 +8,13 @@ int server_receive_id(int client_socket){
   return id;
 }
 
+int server_payload_len(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  return len;
+}
+
 char * server_receive_payload(int client_socket){
   // Se obtiene el largo del payload
   int len = 0;
@@ -205,7 +212,7 @@ void server_connection_established(int client_socket)
 {
   char msg[2];
   msg[0] = 2;
-  msg[1] = 1;
+  msg[1] = 0;
   // Se envía el paquete
   send(client_socket, msg, 2, 0);
 }
@@ -214,7 +221,7 @@ void server_ask_nikname(Player* player)
 {
   char msg[2];
   msg[0] = 3;
-  msg[1] = 1;
+  msg[1] = 0;
   // Se envía el paquete
   send(player->socket, msg, 2, 0);
 }
@@ -230,13 +237,44 @@ void server_save_nickname(Player* player)
 
 void server_oponent_found(PlayersInfo * players_info)
 {
-  char msg[2];
-  msg[0] = 5;
-  msg[1] = 0;
-  // Se envía el paquete
-  for (int i = 0; i < players_info->connected; i++)
+  int max_len = 0;
+  for(int i = 0; i < players_info->connected; i++)
   {
-    send(players_info->players[i]->socket, msg, 2, 0);
+      max_len += strlen(players_info->players[i]->nickname);
+  }
+  char msg[max_len + 3 + (3*players_info->connected)];
+  msg[0] = 5;
+  char* nick;
+  // Se envía el paquete
+  int curr = 2;
+  int to_send = 0;
+  char jump = 10;
+  char line = 45;
+  char space = 32;
+  for(int x = 0; x < players_info->connected; x++)
+  {
+    for (int i = 0; i < players_info->connected; i++)
+    {
+        if(i != x)
+        {
+            nick = players_info->players[i]->nickname;
+            to_send += strlen(nick) + 3;
+            memcpy(&msg[curr], &jump, 1);
+            memcpy(&msg[curr + 1], &line, 1);
+            memcpy(&msg[curr + 2], &space, 1);
+            curr += 3;
+            for(int j = 0; j < strlen(nick); j++)
+            {
+                memcpy(&msg[curr], &nick[j], 1);
+                curr++;
+            }
+        }
+    }
+    msg[curr] = '\0';
+    msg[1] = to_send + 1;
+    send(players_info->players[x]->socket, msg, to_send + 3, 0);
+    curr = 2;
+    to_send = 0;
   }
 }
 

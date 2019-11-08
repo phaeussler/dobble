@@ -153,6 +153,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
   /* Recibe el mensaje y busca la función correspondiente al mensaje */
   if (msg_code == 1){
   /* Start Connection */
+    server_payload_len(players_info->players[my_attention]->socket);
     server_connection_established(players_info->players[my_attention]->socket);
     server_ask_nikname(players_info->players[my_attention]);
   }

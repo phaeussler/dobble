@@ -26,3 +26,4 @@ void server_send_game_winner(PlayersInfo* players, int* winners, int n_winners);
 void server_ask_new_game(PlayersInfo* players);
 void server_get_new_game_response(Player* player);
 void server_send_disconect(PlayersInfo* players);
+int server_payload_len(int client_socket);

@@ -41,7 +41,7 @@ int connect_to_server(char* IP, int PORT)
   printf("2: Close\n");
   printf("What do you want to do: ");
   scanf("%s", doing);
-  printf("------------------------");
+  printf("------------------------\n");
   if(!strcmp(doing, "1"))
   {
     server_socket = prepare_socket(IP, PORT);
@@ -134,9 +134,9 @@ int main(int argc, char *argv[]){
   // Se prepara el socket
   
 
-  connect_to_server(IP, PORT);
+  int start = connect_to_server(IP, PORT);
 
-  while (1){
+  while (start){
     int msg_code = client_receive_id(server_socket);
     
     if (msg_code == 2) {
@@ -156,8 +156,7 @@ int main(int argc, char *argv[]){
 
     else if(msg_code == 5)
     {
-      client_payload_len(server_socket);
-      printf("\nOponent found: ");
+      print_oponent_found(server_socket);
     }
 
     else if(msg_code == 6)

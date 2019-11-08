@@ -43,15 +43,7 @@ void client_start_conection(int client_socket)
   
   char msg[2];
   msg[0] = 1;
-  // Se envía el paquete
-  send(client_socket, msg, 1, 0);
-}
-
-void client_request_cards(int client_socket)
-{
-  
-  char msg[2];
-  msg[0] = 9;
+  msg[1] = 0;
   // Se envía el paquete
   send(client_socket, msg, 1, 0);
 }
@@ -285,4 +277,19 @@ void client_get_game(int server_socket)
 
   printf("Starting game N°%d\n", game_number);
 
+}
+
+void print_oponent_found(int server_socket)
+{
+  int len = 0;
+  recv(server_socket, &len, 1, 0);
+  char* oponents = calloc(len, 1);
+  recv(server_socket, oponents, len, 0);
+  printf("Oponent(s) found:");
+  for(int i = 0; i < len; i++)
+  {
+    printf("%c", oponents[i]);
+  }
+
+  free(oponents);
 }

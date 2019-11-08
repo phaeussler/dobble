@@ -274,3 +274,15 @@ void client_response_new_game(int server_socket, int answer)
 
   send(server_socket, msg, 3, 0);
 }
+
+void client_get_game(int server_socket)
+{
+  int len = 0;
+  recv(server_socket, &len, 1, 0);
+
+  int game_number = 0;
+  recv(server_socket, &game_number, 1, 0);
+
+  printf("Starting game N°%d\n", game_number);
+
+}

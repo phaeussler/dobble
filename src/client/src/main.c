@@ -168,8 +168,7 @@ int main(int argc, char *argv[]){
 
     else if(msg_code == 7)
     {
-      client_payload_len(server_socket);
-      printf("\nStart game: ");
+      client_get_game(server_socket);
       /* Seteo el timer */
     }
 

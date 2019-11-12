@@ -1,10 +1,18 @@
 #include "comunication.h"
 
+
 int server_receive_id(int client_socket){
   // Se obtiene solamente el ID del mensaje
   int id = 0;
   recv(client_socket, &id, 1, 0);
   return id;
+}
+
+int server_payload_len(int client_socket)
+{
+  int len = 0;
+  recv(client_socket, &len, 1, 0);
+  return len;
 }
 
 char * server_receive_payload(int client_socket){
@@ -142,7 +150,8 @@ int add_words(uint16_t* card, unsigned char* payload, int* size, char** words, i
         // payload[curr] = mySize;
         memcpy(&payload[curr], &mySize, 1);
         for(int j = 0; j < mySize; j++){
-            payload[curr + j + 1] = word[j];
+            // payload[curr + j + 1] = word[j];
+            memcpy(&payload[curr + j + 1], &word[j], 1);
         }
         // payload[curr + mySize + 1] = pos;
         memcpy(&payload[curr + mySize + 1], &pos, 1);
@@ -153,13 +162,14 @@ int add_words(uint16_t* card, unsigned char* payload, int* size, char** words, i
     return curr;
 }
 
-void send_words(int client_socket, char** words, int* size)
+unsigned char* send_words(char** words, int* size, char* obj_word)
 {
 
     uint16_t* n_words = calloc(19, sizeof(uint16_t));
     int rep = rand() % 18;
 
     random_numbers(n_words);
+    strcpy(obj_word, words[n_words[rep]]);
     
     uint16_t* first_card = sep_words(n_words, rep);
     uint16_t* second_card = second_sep_words(n_words, first_card, rep);
@@ -178,7 +188,6 @@ void send_words(int client_socket, char** words, int* size)
     int cant = 2;
     cant = add_words(first_card, sender, size, words, 9, cant, n_words, rep);
     add_words(second_card, sender, size, words, 10, cant, n_words, rep);
-    send(client_socket, sender, 2+payloadSize, 0);
     // int curr = 0;
     // printf("%d ", sender[0]);
     // printf("%d \n", sender[1]);
@@ -194,6 +203,247 @@ void send_words(int client_socket, char** words, int* size)
     // }
     free(first_card);
     free(second_card);
-    free(sender);
+    // free(sender);
     free(n_words);
+    return sender;
+}
+
+void server_connection_established(int client_socket)
+{
+  char msg[2];
+  msg[0] = 2;
+  msg[1] = 0;
+  // Se envía el paquete
+  send(client_socket, msg, 2, 0);
+}
+
+void server_ask_nikname(Player* player)
+{
+  char msg[2];
+  msg[0] = 3;
+  msg[1] = 0;
+  // Se envía el paquete
+  send(player->socket, msg, 2, 0);
+}
+
+void server_save_nickname(Player* player)
+{
+  int len = 0;
+  recv(player->socket, &len, 1, 0);
+  player->nickname = malloc(len);
+  int received = recv(player->socket, player->nickname, len, 0);
+  player->waiting = 1;
+}
+
+void server_oponent_found(PlayersInfo * players_info)
+{
+  int max_len = 0;
+  for(int i = 0; i < players_info->connected; i++)
+  {
+      max_len += strlen(players_info->players[i]->nickname);
+  }
+  char msg[max_len + 3 + (3*players_info->connected)];
+  msg[0] = 5;
+  char* nick;
+  // Se envía el paquete
+  int curr = 2;
+  int to_send = 0;
+  char jump = 10;
+  char line = 45;
+  char space = 32;
+  for(int x = 0; x < players_info->connected; x++)
+  {
+    for (int i = 0; i < players_info->connected; i++)
+    {
+        if(i != x)
+        {
+            nick = players_info->players[i]->nickname;
+            to_send += strlen(nick) + 3;
+            memcpy(&msg[curr], &jump, 1);
+            memcpy(&msg[curr + 1], &line, 1);
+            memcpy(&msg[curr + 2], &space, 1);
+            curr += 3;
+            for(int j = 0; j < strlen(nick); j++)
+            {
+                memcpy(&msg[curr], &nick[j], 1);
+                curr++;
+            }
+        }
+    }
+    msg[curr] = '\0';
+    msg[1] = to_send + 1;
+    send(players_info->players[x]->socket, msg, to_send + 3, 0);
+    curr = 2;
+    to_send = 0;
+  }
+}
+
+
+void server_start_game(PlayersInfo * players_info, int game)
+{
+  char msg[3];
+  msg[0] = 7;
+  msg[1] = 1;
+  msg[2] = game;
+  // Se envía el paquete
+  for (int i = 0; i < players_info->connected; i++)
+  {
+    send(players_info->players[i]->socket, msg, 3, 0);
+  }
+}
+
+void server_send_ids(PlayersInfo* players_info)
+{
+    
+    for (int i = 0; i < players_info->connected; i++)
+    {
+        unsigned char msg[3];
+        msg[0] = 6;
+        msg[1] = 1;
+        msg[2] = i + 1;
+        send(players_info->players[i]->socket, msg, 3, 0);
+    }
+}
+
+void server_send_scores(PlayersInfo* players_info)
+{
+    int n_players = players_info->connected;
+    char* sender = calloc(1 + 1 + n_players, 1);
+    sender[0] = 8;
+    sender[1] = n_players;
+    int curr = 2;
+    for(int i = 0; i < n_players; i++)
+    {
+        sender[curr] = players_info->players[i]->win;
+        curr++;
+        for(int j = 0; j < n_players; j++)
+        {
+            if(i != j)
+            {
+                sender[curr] = players_info->players[j]->win;
+                curr++;
+            }
+        }
+        send(players_info->players[i]->socket, sender, 2 + n_players, 0);
+        curr = 2;
+    }
+    free(sender);
+}
+
+char* server_get_answer(Player* player)
+{
+  char* ans = calloc(21, 1);
+  int len = 0;
+  recv(player->socket, &len, 1, 0);
+  recv(player->socket, ans, len, 0);
+  return ans;
+}
+
+void server_send_response_word(Player * players_info, int correct, int times)
+{
+  char msg[4];
+  msg[0] = 11;
+  msg[1] = 2;
+  msg[2] = correct;
+  msg[3] = times;
+  // Se envía el paquete
+  send(players_info->socket, msg, 4, 0);
+}
+
+void server_send_round_winner(PlayersInfo* players, int* winners, int n_winners)
+{
+    unsigned char* msg;
+    int senders = n_winners;
+    if(players->connected > n_winners)
+    {
+        msg = calloc(2 + n_winners, 1);
+        msg[0] = 12;
+        msg[1] = n_winners;
+        for(int j = 0; j < n_winners; j++)
+        {
+            msg[2 + j] = winners[j] + 1;
+        }
+    }
+    else
+    {
+        msg = calloc(3, 1);
+        msg[0] = 12;
+        msg[1] = 1;
+        msg[2] = 0;
+        senders = 1;
+    }
+    
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2 + senders, 0);
+    }
+    free(msg);
+}
+
+void server_send_end_game(PlayersInfo* players, int games)
+{
+    unsigned char* msg = calloc(3, 1);
+    msg[0] = 13;
+    msg[1] = 1;
+    msg[2] = games;
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 3, 0);
+    }
+    free(msg);
+}
+
+void server_send_game_winner(PlayersInfo* players, int* winners, int n_winners)
+{
+    unsigned char* msg = calloc(2 + n_winners, 1);
+    int senders = n_winners;
+
+    msg[0] = 14;
+    msg[1] = n_winners;
+    for(int j = 0; j < n_winners; j++)
+    {
+        msg[2 + j] = winners[j] + 1;
+    }
+    
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2 + senders, 0);
+    }
+    free(msg);
+}
+
+void server_ask_new_game(PlayersInfo* players)
+{
+    unsigned char* msg = calloc(2, 1);
+    msg[0] = 15;
+    msg[1] = 0;
+
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2, 0);
+    }
+    free(msg);
+}
+
+void server_get_new_game_response(Player* player)
+{
+    int len = 0;
+    int answer = 0;
+    recv(player->socket, &len, 1, 0);
+    recv(player->socket, &answer, len, 0);
+    if(answer) player->new_game = 1;
+    else player->new_game = -1;
+}
+
+void server_send_disconect(PlayersInfo* players)
+{
+    unsigned char* msg = calloc(2, 1);
+    msg[0] = 17;
+    msg[1] = 0;
+    for(int i = 0; i < players->connected; i++)
+    {
+        send(players->players[i]->socket, msg, 2, 0);
+        close(players->players[i]->socket);
+    }
+    free(msg);
 }

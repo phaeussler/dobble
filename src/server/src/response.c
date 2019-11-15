@@ -16,7 +16,7 @@ extern int rounds;
 //     if(!cards_defined)
 //     {
 //         cards = send_words(words, size);
-//         cards_defined = 1;  
+//         cards_defined = 1;
 //     }
 //     send(players_info -> players[my_attention] -> socket, cards, 2 + cards[1], 0);
 // }
@@ -43,7 +43,7 @@ extern int rounds;
 void server_send_cards(PlayersInfo * players_info){
   if(!cards_defined){
     cards = send_words(words, size, obj_word);
-    cards_defined = 1;  
+    cards_defined = 1;
   }
   for (int i = 0; i < players_info->connected; i++)
   {
@@ -56,13 +56,13 @@ void server_send_cards_to_player(Player* player){
 }
 
 void str_to_uppercase(char* str){
-  int j = 0; 
-  // char ch; 
-  while (str[j]) { 
-    // ch = str[j]; 
+  int j = 0;
+  // char ch;
+  while (str[j]) {
+    // ch = str[j];
     str[j] = toupper(str[j]);
-    j++; 
-  } 
+    j++;
+  }
 }
 
 int get_round_winner(PlayersInfo* players, int* winners)
@@ -75,7 +75,7 @@ int get_round_winner(PlayersInfo* players, int* winners)
   }
   for(int i = 0; i < players->connected; i++)
   {
-    if(players->players[i]->score >= big) 
+    if(players->players[i]->score >= big)
     {
       winners[n_winners] = i;
       n_winners++;
@@ -94,7 +94,7 @@ int get_game_winner(PlayersInfo* players, int* winners)
   }
   for(int i = 0; i < players->connected; i++)
   {
-    if(players->players[i]->win >= big) 
+    if(players->players[i]->win >= big)
     {
       winners[n_winners] = i;
       n_winners++;
@@ -142,7 +142,9 @@ void reset_wins(PlayersInfo* players)
 // void disconnect(){}
 
 
-// void error_bad_Package(){}
+void error_bad_Package_sent(){
+  NULL;
+}
 
 
 // void bonus_image(){}
@@ -159,7 +161,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
   }
   else if (msg_code == 2){
     /* Connection Established */
-  
+
   }
   else if (msg_code == 3){
     /* Ask Nickname */
@@ -257,7 +259,7 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
         games++;
         server_ask_new_game(players_info);
       }
-      
+
     }
     free(ans);
 
@@ -308,11 +310,14 @@ void handle_message(PlayersInfo * players_info, int my_attention, int msg_code){
     // if(!cards_defined)
     //   {
     //     cards = send_words(words, size);
-    //     cards_defined = 1;  
+    //     cards_defined = 1;
     //   }
     //   send(players_info->players[my_attention]->socket, cards, 2+cards[1], 0);
   }
   else if (msg_code == 64){
     /* Bonus Image */
+  }
+  else{
+    server_bad_package(players_info->players[my_attention]);
   }
 }

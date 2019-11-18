@@ -45,7 +45,8 @@ void client_start_conection(int client_socket)
   msg[0] = 1;
   msg[1] = 0;
   // Se envía el paquete
-  send(client_socket, msg, 1, 0);
+  send(client_socket, msg, 2, 0);
+  printf("[sended] client_start_conection\n");
 }
 
 void print_one_word(char* word, int size, int pos)

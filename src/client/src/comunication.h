@@ -21,3 +21,4 @@ void client_recive_game_winner(int client_socket, int myId);
 void client_response_new_game(int server_socket, int answer);
 void client_get_game(int server_socket);
 void print_oponent_found(int server_socket);
+int game_turn(int server_socket);

@@ -117,7 +117,7 @@ int load_input(uint8_t *log, int *port, char **ip, int argc, char *argv[]){
 
 int main(int argc, char *argv[]){
   char nickname[50];
-  char answer_word[21];
+  // char answer_word[21];
   int debug = 1;
   char *IP;
   int PORT;
@@ -136,8 +136,10 @@ int main(int argc, char *argv[]){
 
   int start = connect_to_server(IP, PORT);
 
+  int msg_code;
   while (start){
-    int msg_code = client_receive_id(server_socket);
+    msg_code = client_receive_id(server_socket);
+    // printf("msg_code: %d \n", msg_code);
     
     if (msg_code == 2) {
       client_payload_len(server_socket);
@@ -175,9 +177,11 @@ int main(int argc, char *argv[]){
     else if (msg_code == 9)
     {
       print_cards(server_socket);
-      printf("\nWhich word is repeated?: ");
-      scanf("%s", answer_word);
-      client_send_obj_word(server_socket, answer_word);
+      game_turn(server_socket);
+      
+      // printf("\nWhich word is repeated?: ");
+      // scanf("%s", answer_word);
+      // client_send_obj_word(server_socket, answer_word);
     }
 
     else if(msg_code == 8)

@@ -46,7 +46,6 @@ void client_start_conection(int client_socket)
   msg[1] = 0;
   // Se envía el paquete
   send(client_socket, msg, 2, 0);
-  printf("[sended] client_start_conection\n");
 }
 
 void print_one_word(char* word, int size, int pos)
@@ -293,4 +292,41 @@ void print_oponent_found(int server_socket)
   }
 
   free(oponents);
+}
+
+void client_send_disconect(int server_socket)
+{
+    // unsigned char* msg = calloc(2, 1);
+    char msg[3];
+    msg[0] = 17;
+    msg[1] = 0;
+    send(server_socket, msg, 2, 0);
+    // free(msg);
+}
+
+int game_turn(int server_socket){
+  char doing[10];
+  char answer_word[21];
+  printf("Menu:\n");
+  printf("1: Send an answer\n");
+  printf("2: Disconect\n");
+  printf("What do you want to do: ");
+  scanf("%s", doing);
+  if(!strcmp(doing, "1"))
+  {
+    printf("\nWhich word is repeated?: \n");
+    scanf("%s", answer_word);
+    client_send_obj_word(server_socket, answer_word);
+    return 1;
+  }
+  else if(!strcmp(doing, "2"))
+  {
+    client_send_disconect(server_socket);
+    return 0;
+  }
+  else
+  {
+    printf("Please select a valid option (1 or 2)\n");
+    return game_turn(server_socket);
+  }
 }

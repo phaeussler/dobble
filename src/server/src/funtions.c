@@ -32,3 +32,14 @@ int new_game_players(PlayersInfo* players)
   if(responses == players->connected) return 1;
   else return 0;
 }
+
+int valueinarray(int val, int* arr, int len)
+{
+  int i;
+  for(i = 0; i < len; i++)
+  {
+    if(arr[i] == val)
+      return 1;
+  }
+  return 0;
+}

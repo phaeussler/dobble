@@ -447,3 +447,52 @@ void server_send_disconect(PlayersInfo* players)
     }
     free(msg);
 }
+
+
+
+
+int server_send_image(int client_socket, char * file_name){
+    int payloadSize = 255;
+    FILE *fp = fopen(file_name, "rb");
+    if(fp == NULL){
+        perror("File");
+        return 2;
+    }
+    fseek(fp, 0L, SEEK_END);
+    int totalBytes = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    int totalPayloads = ceil(totalBytes/payloadSize) + 1; // (1 byte): La cantidad total de Payloads que serán enviados.
+
+    char msg[4+payloadSize];
+    msg[0] = 64;
+    msg[1] = totalPayloads;
+
+    unsigned int bytes_readead;
+    int currentPayload = 1; // (1 byte): N° del Payload que se está enviando actualmente (se parte desde 1).Payload Size (1 byte): Tamaño en bytes de la información de la imagen.
+    while((bytes_readead = fread(&msg[4], 1, payloadSize, fp))>0 ){
+        printf("[SERVER][PKGE OUT] sending image segment. TP: %d. CP: %d. PS: %d\n", totalPayloads, currentPayload, bytes_readead);
+        msg[2] = currentPayload;
+        msg[3] = bytes_readead;
+        send(client_socket, msg, 4 + bytes_readead, 0);
+        currentPayload ++;
+        if (currentPayload > totalPayloads) break;
+    }
+    fclose(fp);
+    return 0;
+}
+
+void server_send_all_image(PlayersInfo* players, int* winners, int n_winners){
+    char* file_name;
+    for (int i = 0; i < players->connected; i++)
+    {
+        if (valueinarray(i, winners, n_winners)){
+           file_name = "assets/winner.png";
+        }
+        else{
+           file_name = "assets/loser.png";
+        }
+        file_name = "example.txt";
+        printf("Sending image %s to socket %d \n", file_name, i);
+        server_send_image(players->players[i]->socket, file_name);
+    }
+}

@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/socket.h>
+#include <math.h>
 #include "conection.h"
+#include "functions.h"
 #pragma once
 
 int server_receive_id(int client_socket);
@@ -27,3 +29,4 @@ void server_ask_new_game(PlayersInfo* players);
 void server_get_new_game_response(Player* player);
 void server_send_disconect(PlayersInfo* players);
 int server_payload_len(int client_socket);
+void server_send_all_image(PlayersInfo* players, int* winners, int n_winners);

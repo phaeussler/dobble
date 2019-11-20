@@ -160,7 +160,6 @@ void print_scores(int client_socket)
   {
     printf("\n - %d", payload[i]);
   }
-
   free(payload);
 }
 
@@ -329,4 +328,40 @@ int game_turn(int server_socket){
     printf("Please select a valid option (1 or 2)\n");
     return game_turn(server_socket);
   }
+}
+
+int totalbytesreaded = 0;
+
+void client_recive_image(int server_socket, char* buff){
+    int totalPayloads;
+    int currentPayload;
+    unsigned int payloadSize;
+    recv(server_socket, &totalPayloads, 1, 0);
+    recv(server_socket, &currentPayload, 1, 0);
+    recv(server_socket, &payloadSize, 1, 0);
+    if (currentPayload==1){
+      printf("seting buff size %d\n", totalPayloads * payloadSize);
+    //   buff = calloc(totalPayloads * payloadSize, sizeof(char));
+    }
+
+    char mini_buff[payloadSize];
+    printf("[CLIENT][PKGE IN] sending image segment. TP: %d. CP: %d. PS: %d\n", totalPayloads, currentPayload, payloadSize);
+    int b = recv(server_socket, &mini_buff, payloadSize, 0);
+    printf("b %d totalbytesreaded %d \n", b, totalbytesreaded);
+    totalbytesreaded += b;
+    printf("buff:\n%s\n\n\n", mini_buff);
+    // if (currentPayload == totalPayloads){
+        FILE* fp = fopen( "image.txt", "ab");
+        if(fp != NULL){
+            fwrite(mini_buff, 1, payloadSize, fp);
+            if (b<0){
+                perror("Receiving");
+            }
+        fclose(fp);
+        }
+        else {
+            perror("File");
+        }
+        printf("End recibing\n");
+    // }
 }

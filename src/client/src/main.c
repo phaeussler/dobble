@@ -221,6 +221,11 @@ int main(int argc, char *argv[]){
       client_payload_len(server_socket);
       printf("Disconected\n");
       break;
+    }
+    else if(msg_code == 64)
+    {
+      char* buff;
+      client_recive_image(server_socket, buff);
 
     }
     // printf("------------------\n");

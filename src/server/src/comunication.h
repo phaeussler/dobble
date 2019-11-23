@@ -1,11 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <time.h>
-#include <sys/socket.h>
-#include "conection.h"
 #pragma once
+#include "conection.h"
+#include "logs.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <time.h>
 
 int server_receive_id(int client_socket);
 char *server_receive_payload(int client_socket);

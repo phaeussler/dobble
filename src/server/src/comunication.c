@@ -1,33 +1,81 @@
 #include "comunication.h"
 
-int server_receive_id(int client_socket)
+int server_receive_id(int client_socket) // Con Log
 {
-    // Se obtiene solamente el ID del mensaje
+    infolog("Se obtiene solamente el ID del mensaje");
     int id = 0;
-    recv(client_socket, &id, 1, 0);
+    int byte_recv = recv(client_socket, &id, 1, 0);
+    if (byte_recv != 1)
+    {
+        char msg[255];
+        sprintf(msg, "%s::Unable to recieve ID. Bytes espected: 1; Bytes IN: %d", __func__, byte_recv);
+        error(msg);
+        free(msg);
+        return 0;
+    }
+    char msg[255];
+    sprintf(msg, "%s::Received ID. Bytes IN: 1", __func__);
+    infolog(msg);
+    free(msg);
     return id;
 }
 
-int server_payload_len(int client_socket)
+int server_payload_len(int client_socket) // Con Log
 {
+    infolog("Se obtiene solamente el Tamaño(Size) del paquete");
     int len = 0;
-    recv(client_socket, &len, 1, 0);
+    int byte_recv = recv(client_socket, &len, 1, 0);
+    if (byte_recv != 1)
+    {
+        char msg[255];
+        sprintf(msg, "%s::Unable to recieve Size. Bytes espected: 1; Bytes IN: %d", __func__, byte_recv);
+        error(msg);
+        free(msg);
+        return 0;
+    }
+    char msg[255];
+    sprintf(msg, "%s::Received Size. Bytes IN: 1", __func__);
+    infolog(msg);
+    free(msg);
     return len;
 }
 
-char *server_receive_payload(int client_socket)
+char *server_receive_payload(int client_socket) // Con Log
 {
-    // Se obtiene el largo del payload
+    infolog("Se obtiene el largo(Size) del payload");
     int len = 0;
-    recv(client_socket, &len, 1, 0);
-    // Se obtiene el payload
+    int byte_recv = recv(client_socket, &len, 1, 0);
+    if (byte_recv != 1)
+    {
+        char msg[255];
+        sprintf(msg, "%s::Unable to recieve Size. Bytes espected: 1; Bytes IN: %d", __func__, byte_recv);
+        error(msg);
+        free(msg);
+        return NULL;
+    }
+    char msg[255];
+    sprintf(msg, "%s::Received Size. Bytes IN: 1", __func__);
+    infolog(msg);
+    free(msg);
     char *payload = malloc(len);
-    int received = recv(client_socket, payload, len, 0);
+    byte_recv = recv(client_socket, payload, len, 0);
+    if (byte_recv != len)
+    {
+        char msg[255];
+        sprintf(msg, "%s::Unable to recieve Payload. Bytes espected: %d; Bytes IN: %d", __func__, len, byte_recv);
+        error(msg);
+        free(msg);
+        return NULL;
+    }
+    char msg[255];
+    sprintf(msg, "%s::Received Payload. Bytes IN: %d", __func__, byte_recv);
+    infolog(msg);
+    free(msg);
     // Se retorna
     return payload;
 }
 
-void server_send_message(int client_socket, int pkg_id, char *message)
+void server_send_message(int client_socket, int pkg_id, char *message) // Con Log
 {
     int payloadSize = strlen(message) + 1;
     //printf("payload size: %d\n", payloadSize);
@@ -38,6 +86,13 @@ void server_send_message(int client_socket, int pkg_id, char *message)
     memcpy(&msg[2], message, payloadSize);
     // Se envía el paquete
     send(client_socket, msg, 2 + payloadSize, 0);
+    char msg0[255 + 6 * payloadSize];
+    sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+    for (int i = 0; i < payloadSize; i++)
+        sprintf(msg0, "%#x ", msg[2 + i]);
+    sprintf(msg0, "}");
+    infolog(msg0);
+    free(msg0);
 }
 
 int not_in(uint16_t *n_words, int word, int size)
@@ -201,44 +256,78 @@ unsigned char *send_words(char **words, int *size, char *obj_word)
     return sender;
 }
 
-void server_connection_established(int client_socket)
+void server_connection_established(int client_socket) // Con Log
 {
     char msg[2];
     msg[0] = 2;
     msg[1] = 0;
     // Se envía el paquete
     send(client_socket, msg, 2, 0);
+    char msg0[255 + 6 * payloadSize];
+    sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+    for (int i = 0; i < payloadSize; i++)
+        sprintf(msg0, "%#x ", msg[2 + i]);
+    sprintf(msg0, "}");
+    infolog(msg0);
+    free(msg0);
 }
 
-void server_ask_nikname(Player *player)
+void server_ask_nikname(Player *player) // Con Log
 {
     char msg[2];
     msg[0] = 3;
     msg[1] = 0;
     // Se envía el paquete
     send(player->socket, msg, 2, 0);
+    char msg0[255 + 6 * payloadSize];
+    sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+    for (int i = 0; i < payloadSize; i++)
+        sprintf(msg0, "%#x ", msg[2 + i]);
+    sprintf(msg0, "}");
+    infolog(msg0);
+    free(msg0);
 }
 
-void server_bad_package(Player *player)
+void server_bad_package(Player *player) // Con Log
 {
     char msg[2];
     msg[0] = 20;
     msg[1] = 0;
     // Se envía el paquete
     send(player->socket, msg, 2, 0);
-    free(msg);  // Segun yo no hace mal ;)
+    char msg0[255 + 6 * masg[1]];
+    sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+    for (int i = 0; i < msg[1]; i++)
+        sprintf(msg0, "%#x ", msg[2 + i]);
+    sprintf(msg0, "}");
+    infolog(msg0);
+    free(msg0);
+    free(msg); // Segun yo no hace mal ;)
 }
 
-void server_save_nickname(Player *player)
+void server_save_nickname(Player *player) // Con Log
 {
     int len = 0;
     recv(player->socket, &len, 1, 0);
     player->nickname = malloc(len);
-    int received = recv(player->socket, player->nickname, len, 0);
+    int byte_recv = recv(player->socket, player->nickname, len, 0);
+    if (byte_recv != len)
+    {
+        char msg[255];
+        sprintf(msg, "%s::Unable to recieve Payload. Bytes espected: %d; Bytes IN: %d", __func__, len, byte_recv);
+        error(msg);
+        free(msg);
+        server_bad_package(player);
+        return;
+    }
+    char msg0[255 + 6 * len];
+    sprintf(msg0, "%s::Recieved Package %s. Bytes IN: {ID=4}{Size=%d}{Payload=%s}", __func__, MSG_NAMES[4], len, player->nickname);
+    infolog(msg0);
+    free(msg0);
     player->waiting = 1;
 }
 
-void server_oponent_found(PlayersInfo *players_info)
+void server_oponent_found(PlayersInfo *players_info) // Con Log
 {
     int max_len = 0;
     for (int i = 0; i < players_info->connected; i++)
@@ -276,12 +365,16 @@ void server_oponent_found(PlayersInfo *players_info)
         msg[curr] = '\0';
         msg[1] = to_send + 1;
         send(players_info->players[x]->socket, msg, to_send + 3, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=%s}", __func__, MSG_NAMES[msg[0]], msg[0], msg[1], &msg[2]);
+        infolog(msg0);
+        free(msg0);
         curr = 2;
         to_send = 0;
     }
 }
 
-void server_start_game(PlayersInfo *players_info, int game)
+void server_start_game(PlayersInfo *players_info, int game) // Con Log
 {
     char msg[3];
     msg[0] = 7;
@@ -291,10 +384,14 @@ void server_start_game(PlayersInfo *players_info, int game)
     for (int i = 0; i < players_info->connected; i++)
     {
         send(players_info->players[i]->socket, msg, 3, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=%d}", __func__, MSG_NAMES[msg[0]], msg[0], msg[1], msg[2]);
+        infolog(msg0);
+        free(msg0);
     }
 }
 
-void server_send_ids(PlayersInfo *players_info)
+void server_send_ids(PlayersInfo *players_info) // Con Log
 {
 
     for (int i = 0; i < players_info->connected; i++)
@@ -304,10 +401,14 @@ void server_send_ids(PlayersInfo *players_info)
         msg[1] = 1;
         msg[2] = i + 1;
         send(players_info->players[i]->socket, msg, 3, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=%d}", __func__, MSG_NAMES[msg[0]], msg[0], msg[1], msg[2]);
+        infolog(msg0);
+        free(msg0);
     }
 }
 
-void server_send_scores(PlayersInfo *players_info)
+void server_send_scores(PlayersInfo *players_info) // Con Log
 {
     int n_players = players_info->connected;
     char *sender = calloc(1 + 1 + n_players, 1);
@@ -327,21 +428,33 @@ void server_send_scores(PlayersInfo *players_info)
             }
         }
         send(players_info->players[i]->socket, sender, 2 + n_players, 0);
+        char msg0[255 + 6 * sender[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[sender[0]], sender[0], sender[1]);
+        for (int i = 0; i < sender[1]; i++)
+            sprintf(msg0, "%#x ", sender[2 + i]);
+        sprintf(msg0, "}");
+        infolog(msg0);
+        free(msg0);
         curr = 2;
     }
     free(sender);
 }
 
-char *server_get_answer(Player *player)
+char *server_get_answer(Player *player) // TODO
 {
     char *ans = calloc(21, 1);
     int len = 0;
     recv(player->socket, &len, 1, 0);
-    recv(player->socket, ans, len, 0);
+    int byte_recv = recv(player->socket, ans, len, 0);
+    if (byte_recv != len)
+    {
+        /* TODO: ID not recieved properly */
+        return -1;
+    }
     return ans;
 }
 
-void server_send_response_word(Player *players_info, int correct, int times)
+void server_send_response_word(Player *players_info, int correct, int times) // Con Log
 {
     char msg[4];
     msg[0] = 11;
@@ -350,9 +463,16 @@ void server_send_response_word(Player *players_info, int correct, int times)
     msg[3] = times;
     // Se envía el paquete
     send(players_info->socket, msg, 4, 0);
+    char msg0[255 + 6 * msg[1]];
+    sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+    for (int i = 0; i < msg[1]; i++)
+        sprintf(msg0, "%#x ", msg[2 + i]);
+    sprintf(msg0, "}");
+    infolog(msg0);
+    free(msg0);
 }
 
-void server_send_round_winner(PlayersInfo *players, int *winners, int n_winners)
+void server_send_round_winner(PlayersInfo *players, int *winners, int n_winners) // Con Log
 {
     unsigned char *msg;
     int senders = n_winners;
@@ -378,11 +498,15 @@ void server_send_round_winner(PlayersInfo *players, int *winners, int n_winners)
     for (int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 2 + senders, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=%d} ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1], msg[2]);
+        infolog(msg0);
+        free(msg0);
     }
     free(msg);
 }
 
-void server_send_end_game(PlayersInfo *players, int games)
+void server_send_end_game(PlayersInfo *players, int games) // Con Log
 {
     unsigned char *msg = calloc(3, 1);
     msg[0] = 13;
@@ -391,11 +515,15 @@ void server_send_end_game(PlayersInfo *players, int games)
     for (int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 3, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=%d}", __func__, MSG_NAMES[msg[0]], msg[0], msg[1], msg[2]);
+        infolog(msg0);
+        free(msg0);
     }
     free(msg);
 }
 
-void server_send_game_winner(PlayersInfo *players, int *winners, int n_winners)
+void server_send_game_winner(PlayersInfo *players, int *winners, int n_winners) // Con Log
 {
     unsigned char *msg = calloc(2 + n_winners, 1);
     int senders = n_winners;
@@ -410,11 +538,18 @@ void server_send_game_winner(PlayersInfo *players, int *winners, int n_winners)
     for (int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 2 + senders, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+        for (int i = 0; i < msg[1]; i++)
+            sprintf(msg0, "%#x ", msg[2 + i]);
+        sprintf(msg0, "}");
+        infolog(msg0);
+        free(msg0);
     }
     free(msg);
 }
 
-void server_ask_new_game(PlayersInfo *players)
+void server_ask_new_game(PlayersInfo *players) // Con Log
 {
     unsigned char *msg = calloc(2, 1);
     msg[0] = 15;
@@ -423,23 +558,32 @@ void server_ask_new_game(PlayersInfo *players)
     for (int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 2, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload=}", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+        infolog(msg0);
+        free(msg0);
     }
     free(msg);
 }
 
-void server_get_new_game_response(Player *player)
+void server_get_new_game_response(Player *player) // TODO
 {
     int len = 0;
     int answer = 0;
     recv(player->socket, &len, 1, 0);
-    recv(player->socket, &answer, len, 0);
+    int byte_recv = recv(player->socket, &answer, len, 0);
+    if (byte_recv != len + 1)
+    {
+        /* TODO: ID not recieved properly */
+        return (void)NULL;
+    }
     if (answer)
         player->new_game = 1;
     else
         player->new_game = -1;
 }
 
-void server_send_disconect(PlayersInfo *players)
+void server_send_disconect(PlayersInfo *players) // Con Log
 {
     unsigned char *msg = calloc(2, 1);
     msg[0] = 17;
@@ -447,6 +591,13 @@ void server_send_disconect(PlayersInfo *players)
     for (int i = 0; i < players->connected; i++)
     {
         send(players->players[i]->socket, msg, 2, 0);
+        char msg0[255 + 6 * msg[1]];
+        sprintf(msg0, "%s::Sent Package %s. Bytes OUT: {ID=%d}{Size=%d}{Payload= ", __func__, MSG_NAMES[msg[0]], msg[0], msg[1]);
+        for (int i = 0; i < msg[1]; i++)
+            sprintf(msg0, "%#x ", msg[2 + i]);
+        sprintf(msg0, "}");
+        infolog(msg0);
+        free(msg0);
         close(players->players[i]->socket);
     }
     free(msg);

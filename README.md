@@ -1,4 +1,4 @@
-# Proyecto Redes
+# Arch Linux Project - Redes
 ## Check list
 1. ~~Start Connection~~
 2. ~~Connection Established~~
@@ -18,4 +18,28 @@
 16. ~~Answer New Game~~
 17. ~~Disconnect~~
 18. ~~Error Bad Package~~
+
+
+## Miembros
+
+| Nombre | N° de Alumno | Mail |
+| :----- | :----------: | :--: |
+| Pablo Haeussler* | 14620138 | pahaeussler@uc.cl |
+| Cristobal Poblete | 15623688 | cmpoblete@uc.cl |
+| Alfonso Aguirrebeña |15621863 | aaguirrebena@uc.cl |
+| Henry Blair González | 13634372 | hblair1@uc.cl |
+
+## Proyectos
+
+### **Redes:** *Dobble*
+
+Protocolo de comunicación entre un servidor y multiples clientes para coordinar un juego.
+
+#### Desiciones de Diseño
+
+#### Supuestos Adicionales
+
+#### Información Relevante
+
+Para usar el script de rápida compilación y ejecución del main escribir en consola `make`, finalmente para correrlo ejecutar `./server` en una terminal y en terminales distintas iniciar con `./client`
 

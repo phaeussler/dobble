@@ -59,7 +59,7 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
       clients -> players[client] -> waiting = 0;
       clients -> players[client] -> socket = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
       clients -> players[client] -> last_code = 0;
-      clients -> players[client] -> new_game = 0; 
+      clients -> players[client] -> new_game = 0;
       flags = fcntl(clients->players[client]->socket, F_GETFL, 0);
       err = fcntl(clients->players[client]->socket, F_SETFL, flags | O_NONBLOCK);
       clients -> connected ++;
@@ -86,7 +86,7 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
         clients -> players[client] -> waiting = 0;
         clients -> players[client] -> socket = accept(server_socket, (struct sockaddr *)&client_addr[client], &addr_size);
         clients -> players[client] -> last_code = 0;
-        clients -> players[client] -> new_game = 0; 
+        clients -> players[client] -> new_game = 0;
         flags = fcntl(clients->players[client]->socket, F_GETFL, 0);
         err = fcntl(clients->players[client]->socket, F_SETFL, flags | O_NONBLOCK);
         clients -> connected ++;

@@ -491,7 +491,6 @@ void server_send_all_image(PlayersInfo* players, int* winners, int n_winners){
         else{
            file_name = "assets/loser.png";
         }
-        file_name = "example.txt";
         printf("Sending image %s to socket %d \n", file_name, i);
         server_send_image(players->players[i]->socket, file_name);
     }

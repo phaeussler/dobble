@@ -333,14 +333,14 @@ int game_turn(int server_socket){
 int totalbytesreaded = 0;
 
 void client_recive_image(int server_socket, char* buff){
-    int totalPayloads;
-    int currentPayload;
-    unsigned int payloadSize;
+    int totalPayloads = 0;
+    int currentPayload = 0;
+    unsigned int payloadSize = 0;
     recv(server_socket, &totalPayloads, 1, 0);
     recv(server_socket, &currentPayload, 1, 0);
     recv(server_socket, &payloadSize, 1, 0);
     if (currentPayload==1){
-      printf("seting buff size %d\n", totalPayloads * payloadSize);
+      // printf("seting buff size %d\n", totalPayloads * payloadSize);
     //   buff = calloc(totalPayloads * payloadSize, sizeof(char));
     }
 
@@ -351,7 +351,7 @@ void client_recive_image(int server_socket, char* buff){
     totalbytesreaded += b;
     printf("buff:\n%s\n\n\n", mini_buff);
     // if (currentPayload == totalPayloads){
-        FILE* fp = fopen( "image.txt", "ab");
+        FILE* fp = fopen( "image.png", "ab");
         if(fp != NULL){
             fwrite(mini_buff, 1, payloadSize, fp);
             if (b<0){

@@ -1,21 +1,22 @@
-# Proyecto Redes
-## Check list
-1. ~~Start Connection~~
-2. ~~Connection Established~~
-3. ~~Ask Nickname~~
-4. ~~Return Nickname~~
-5. ~~Opponent Found~~: El payload sera igual a los nicknames de sus oponentes(por arreglar)
-6. ~~Send IDs~~
-7. ~~Start Game~~
-8. ~~Scores~~: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
-9. ~~Send Cards~~
-10. ~~Send Word~~
-11. ~~Response Word~~
-12. ~~Round Winner/Loser~~ : El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
-13. ~~End Game~~
-14. ~~Game Winner/Loser~~: El payload tendra igual bytes a la cantidad de clientes en lugar de solo 2 bytes
-15. ~~Ask New Game~~
-16. ~~Answer New Game~~
-17. ~~Disconnect~~
-18. ~~Error Bad Package~~
+# Dobble
+Dobble is a simple pattern recognition game in which players try to find an word shown on two cards. Each card in Dobble features ten different words in disorder. Any two cards have exactly one word in common.
 
+
+The fist time that you want to play, make sure to do make
+```console
+make
+```
+
+If you wanna play:
+For each time that you want to play the server shoud be running.
+```console
+./server -p 3000 -l -i 127.0.0.1;
+```
+And for each player run.
+```console
+./client -p 3000 -l -i 127.0.0.1;
+```
+
+In `src/server/globlas.c` you can change te number of players and the time to wait until the game will start.
+
+Enjoy the game 
